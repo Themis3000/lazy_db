@@ -78,8 +78,7 @@ class LazyDb:
         """Gets db info"""
         self.f.seek(0, io.SEEK_SET)
         data_bytes = self.read_to(b"\x00")
-        data_str = data_bytes.decode("utf-8")
-        info_dict = json.loads(data_str)
+        info_dict = self.bytes_to_dict(data_bytes)
         return info_dict
 
     def read_to(self, to_byte: bytes) -> bytes:
@@ -105,42 +104,48 @@ class LazyDb:
                 "key_int_size": self.key_int_size,
                 "content_int_size": self.content_int_size}
         info_str = json.dumps(info, separators=(',', ':'))
-        self.f.write(info_str.encode("utf-8") + b"\x00")
+        self.f.write(self.str_to_bytes(info_str, add_type_header=False) + b"\x00")
 
     def bytes_to_str(self, bytes_in: bytes) -> str:
         """Convert bytes to string"""
         return bytes_in.decode("utf-8")
 
-    def str_to_bytes(self, string_in: str) -> bytes:
+    def str_to_bytes(self, string_in: str, add_type_header: bool = True) -> bytes:
         """Convert a string to bytes"""
         data = string_in.encode("utf-8")
-        return b"\x01" + data
+        if add_type_header:
+            return b"\x01" + data
+        return data
 
     def bytes_to_int(self, bytes_in: bytes) -> int:
         """Convert bytes to int"""
         return int.from_bytes(bytes_in, 'little')
 
-    def int_to_bytes(self, integer_in: int) -> bytes:
+    def int_to_bytes(self, integer_in: int, add_type_header: bool = True) -> bytes:
         """Convert an integer to bytes"""
         data = integer_in.to_bytes(self.int_size, 'little')
-        return b"\x02" + data
+        if add_type_header:
+            return b"\x02" + data
+        return data
 
     def bytes_to_dict(self, bytes_in: bytes) -> dict:
         """Convert bytes to dict"""
         str_value = self.bytes_to_str(bytes_in)
         return json.loads(str_value)
 
-    def dict_to_bytes(self, dict_in: dict) -> bytes:
+    def dict_to_bytes(self, dict_in: dict, add_type_header: bool = True) -> bytes:
         """Convert dictionary to bytes"""
         json_str = json.dumps(dict_in, separators=(',', ':'))
-        data = self.str_to_bytes(json_str)
-        return b"\x03" + data
+        data = self.str_to_bytes(json_str, add_type_header=False)
+        if add_type_header:
+            return b"\x03" + data
+        return data
 
     def bytes_to_list(self, bytes_in: bytes) -> list:
         """Convert bytes to list"""
         raise NotImplementedError("lists are not yet implemented")
 
-    def list_to_bytes(self, list_in: list) -> bytes:
+    def list_to_bytes(self, list_in: list, add_type_header: bool = True) -> bytes:
         """Convert list to bytes"""
         raise NotImplementedError("lists are not yet implemented")
         # return b"\x04" + b"test"
@@ -159,7 +164,7 @@ class LazyDb:
             return self.bytes_to_list(bytes_data)
         raise TypeError(f"Incorrect type header byte: {bytes_type}. Your database may be corrupted.")
 
-    def to_bytes(self, value: Union[str, int, List[Union[str, int, dict]], Dict[Union[str, int], Union[str, int, list, dict]]]) -> bytes:
+    def to_bytes(self, value: Union[str, int, List[Union[str, int, dict]], Dict[Union[str, int], Union[str, int, list, dict]]], add_type_header: bool = True) -> bytes:
         """Converts a given object to byte form"""
         if isinstance(value, str):
             return self.str_to_bytes(value)
