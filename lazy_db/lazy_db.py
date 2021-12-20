@@ -43,18 +43,18 @@ class LazyDb:
             key_type = self.f.read(1)
             if key_type == b"\x01":
                 key_bytes = self.read_to(b"\x00")
-                key = key_bytes.decode("utf-8")
+                key = self.bytes_to_str(key_bytes)
             elif key_type == b"\x02":
                 key_bytes = self.f.read(self.key_int_size)
                 self.f.seek(1, io.SEEK_CUR)
-                key = int.from_bytes(key_bytes, "little")
+                key = self.bytes_to_int(key_bytes)
             else:
                 raise IndexingError(f"Encountered a problem while indexing: key header byte {key_type} is not a"
                                     f"supported header byte. Your database may be corrupted.")
             headers_out[key] = self.f.tell()
 
             length_bytes = self.f.read(self.content_int_size)
-            length = int.from_bytes(length_bytes, "little")
+            length = self.bytes_to_int(length_bytes)
             self.f.seek(length, io.SEEK_CUR)
 
         return headers_out
@@ -67,7 +67,7 @@ class LazyDb:
 
         self.f.seek(location, io.SEEK_SET)
         length_bytes = self.f.read(self.content_int_size)
-        length = int.from_bytes(length_bytes, "little")
+        length = self.bytes_to_int(length_bytes)
 
         content_bytes = self.f.read(length)
         content = self.from_bytes(content_bytes)
@@ -103,8 +103,8 @@ class LazyDb:
         info = {"int_size": self.int_size,
                 "key_int_size": self.key_int_size,
                 "content_int_size": self.content_int_size}
-        info_str = json.dumps(info, separators=(',', ':'))
-        self.f.write(self.str_to_bytes(info_str, add_type_header=False) + b"\x00")
+        info_str = self.dict_to_bytes(info, add_type_header=False)
+        self.f.write(info_str + b"\x00")
 
     def bytes_to_str(self, bytes_in: bytes) -> str:
         """Convert bytes to string"""
@@ -121,9 +121,12 @@ class LazyDb:
         """Convert bytes to int"""
         return int.from_bytes(bytes_in, 'little')
 
-    def int_to_bytes(self, integer_in: int, add_type_header: bool = True) -> bytes:
+    def int_to_bytes(self, integer_in: int, add_type_header: bool = True, length: int = None) -> bytes:
         """Convert an integer to bytes"""
-        data = integer_in.to_bytes(self.int_size, 'little')
+        if length is None:
+            length = self.int_size
+
+        data = integer_in.to_bytes(length, 'little')
         if add_type_header:
             return b"\x02" + data
         return data
@@ -167,13 +170,13 @@ class LazyDb:
     def to_bytes(self, value: Union[str, int, List[Union[str, int, dict]], Dict[Union[str, int], Union[str, int, list, dict]]], add_type_header: bool = True) -> bytes:
         """Converts a given object to byte form"""
         if isinstance(value, str):
-            return self.str_to_bytes(value)
+            return self.str_to_bytes(value, add_type_header=add_type_header)
         if isinstance(value, int):
-            return self.int_to_bytes(value)
+            return self.int_to_bytes(value, add_type_header=add_type_header)
         if isinstance(value, list):
-            return self.list_to_bytes(value)
+            return self.list_to_bytes(value, add_type_header=add_type_header)
         if isinstance(value, dict):
-            return self.dict_to_bytes(value)
+            return self.dict_to_bytes(value, add_type_header=add_type_header)
         raise TypeError(f"{type(value)} is not a supported content type to be written to the database.")
 
     def gen_header(self, key: Union[str, int], data: bytes) -> Tuple[bytes, int]:
@@ -181,12 +184,11 @@ class LazyDb:
         content_len = len(data)
         # int_to_bytes is not used here since we want to define the int size separately from content, as well as we
         # don't need the type identifier byte
-        content_len_bytes = content_len.to_bytes(self.content_int_size, 'little')
-        # same idea with the key bytes, except we do need the type identifier byte since it could be a int or a string
+        content_len_bytes = self.int_to_bytes(content_len, add_type_header=False, length=self.content_int_size)
         if isinstance(key, str):
-            key_bytes = self.to_bytes(key)
+            key_bytes = self.str_to_bytes(key)
         elif isinstance(key, int):
-            key_bytes = b"\x02" + key.to_bytes(self.key_int_size, 'little')
+            key_bytes = self.int_to_bytes(key, length=self.key_int_size)
         else:
             raise TypeError(f"{type(key)} is not a supported key type to be written to the database.")
 
