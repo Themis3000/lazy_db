@@ -80,3 +80,17 @@ class TestLazy_db(unittest.TestCase):
         value2 = self.db.read(234565)
         self.assertEqual(346735, value1)
         self.assertEqual("test string", value2)
+
+    def test_dict_insertion(self):
+        """test inserting a dict"""
+        self.db.write("test_str", {"key": "value", "sub": ["list", "of", "things"]})
+        value = self.db.read("test_str")
+        self.assertEqual({"key": "value", "sub": ["list", "of", "things"]}, value)
+
+    def test_dict_insertion_restart(self):
+        """test inserting a dict with restart"""
+        self.db.write("test_str", {"key": "value", "sub": ["list", "of", "things"]})
+        self.restart()
+        value = self.db.read("test_str")
+        self.assertEqual({"key": "value", "sub": ["list", "of", "things"]}, value)
+
