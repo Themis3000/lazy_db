@@ -1,0 +1,16 @@
+name: Run Python Tests
+on:
+  - push
+  - pull_request
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Python 3
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.x
+      - name: Run tests with unittest
+        run: python -m unittest 
