@@ -17,8 +17,17 @@ lazy_db
 * Free software: MIT license
 * Documentation: https://lazy-db.readthedocs.io.
 
-A lazily loaded key:value db intended for use with large datasets that are too big to be loaded into memory. The database supports integers, strings, lists, and dictionaries. There may be future support for raw bytes as well. This database is meant to strike good balance retrieval/insertion speed and memory usage.
+A lazily loaded key:value db intended for use with large datasets that are too big to be loaded into memory. The database supports integers, strings, lists, and dictionaries. There may be future support for raw bytes as well. This database is meant to strike a good balance of retrieval/insertion speed and memory usage.
 
+Example usage:
+
+.. code-block:: python
+    from lazy_db import LazyDb
+
+    db = LazyDb("test.lazy")
+    db.write("test_value", "value")
+    print(db.read("test_value"))  # prints "value"
+    db.close()
 This is in very early stages of development right now. Here are changes planned in the future:
 
 * Fix tests
