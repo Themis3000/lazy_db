@@ -1,6 +1,7 @@
 """Main module."""
 import json
 import io
+import math
 from pathlib import Path
 from typing import Dict, List, Union, Tuple
 
@@ -10,12 +11,11 @@ class IndexingError(Exception):
 
 
 class LazyDb:
-    def __init__(self, file: str, int_size: int = 4, key_int_size: int = 4, content_int_size: int = 4):
+    def __init__(self, file: str, key_int_size: int = 4, content_int_size: int = 4):
         """Opens database and sets specified db settings if bootstrapping a new database"""
         path = Path(file)
         if not path.is_file():
             path.touch()
-            self.int_size = int_size
             self.key_int_size = key_int_size
             self.content_int_size = content_int_size
             self.f = open(file, "rb+")
@@ -25,7 +25,6 @@ class LazyDb:
 
         self.f = open(file, "rb+")
         info = self.get_info()
-        self.int_size = info["int_size"]
         self.key_int_size = info["key_int_size"]
         self.content_int_size = info["content_int_size"]
         self.headers = self.get_headers()
@@ -100,8 +99,7 @@ class LazyDb:
 
     def write_info(self):
         """Writes db info. Only should be called when a new database is bootstrapped"""
-        info = {"int_size": self.int_size,
-                "key_int_size": self.key_int_size,
+        info = {"key_int_size": self.key_int_size,
                 "content_int_size": self.content_int_size}
         info_str = self.dict_to_bytes(info, add_type_header=False)
         self.f.write(info_str + b"\x00")
@@ -124,7 +122,8 @@ class LazyDb:
     def int_to_bytes(self, integer_in: int, add_type_header: bool = True, length: int = None) -> bytes:
         """Convert an integer to bytes"""
         if length is None:
-            length = self.int_size
+            # Calculates the least amount of bytes the integer can be fit into
+            length = math.ceil(math.log(integer_in)/math.log(256))
 
         data = integer_in.to_bytes(length, 'little')
         if add_type_header:
