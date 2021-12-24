@@ -58,15 +58,20 @@ class LazyDb:
 
         return headers_out
 
-    def read(self, key: Union[str, int]) -> Union[str, int, List[Union[str, int, dict]], Dict[Union[str, int], Union[str, int, list, dict]], None]:
+    def read_len(self, key: Union[str, int]) -> Union[int, None]:
+        """Reads the content length of a given key and leaves the file pointer at the end of the length bytes"""
         location = self.headers.get(key, None)
 
         if location is None:
-            return None
+            raise KeyError("No entry found for that key")
 
         self.f.seek(location, io.SEEK_SET)
         length_bytes = self.f.read(self.content_int_size)
-        length = self.bytes_to_int(length_bytes)
+        return self.bytes_to_int(length_bytes)
+
+    def read(self, key: Union[str, int]) -> Union[str, int, List[Union[str, int, dict]], Dict[Union[str, int], Union[str, int, list, dict]], None]:
+        """Gets a value"""
+        length = self.read_len(key)
 
         content_bytes = self.f.read(length)
         content = self.from_bytes(content_bytes)
@@ -214,6 +219,9 @@ class LazyDb:
         data = self.to_bytes(value)
         content_location = self.write_bytes(key, data)
         self.headers[key] = content_location
+
+    def delete(self, key: Union[str, int]):
+        pass
 
     def close(self):
         """Close the database"""
