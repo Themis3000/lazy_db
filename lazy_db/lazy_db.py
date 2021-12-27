@@ -236,7 +236,7 @@ class LazyDb:
         # Seeks to the end of the entry to be deleted
         self.f.seek(content_len, io.SEEK_CUR)
 
-        while data := self.f.read(8):
+        while data := self.f.read(1024):
             read_end = self.f.tell()
             back_bytes = len(data) + entry_len
             self.f.seek(back_bytes * -1, io.SEEK_CUR)
