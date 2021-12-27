@@ -220,8 +220,33 @@ class LazyDb:
         content_location = self.write_bytes(key, data)
         self.headers[key] = content_location
 
+    def reconstruct_header_size(self, key: Union[str, int]):
+        if isinstance(key, str):
+            key_size = len(self.str_to_bytes(key, add_type_header=False))
+        else:
+            key_size = self.key_int_size
+        return self.content_int_size + key_size + 3
+
     def delete(self, key: Union[str, int]):
-        pass
+        """Deletes a entry from the database"""
+        content_len = self.read_len(key)
+        header_len = self.reconstruct_header_size(key)
+        entry_len = header_len + content_len
+
+        # Seeks to the end of the entry to be deleted
+        self.f.seek(content_len, io.SEEK_CUR)
+
+        while data := self.f.read(8):
+            read_end = self.f.tell()
+            back_bytes = len(data) + entry_len
+            self.f.seek(back_bytes * -1, io.SEEK_CUR)
+            self.f.write(data)
+            self.f.seek(read_end, io.SEEK_SET)
+
+        self.f.seek(entry_len, io.SEEK_END)
+        self.f.truncate()
+
+        self.headers = self.get_headers()
 
     def close(self):
         """Close the database"""

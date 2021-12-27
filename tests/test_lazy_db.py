@@ -94,3 +94,25 @@ class TestLazy_db(unittest.TestCase):
         value = self.db.read("test_str")
         self.assertEqual({"key": "value", "sub": ["list", "of", "things"]}, value)
 
+    def test_deletion(self):
+        """test deleting an element"""
+        self.db.write("test_str", "here is a test value")
+        self.db.write("test_str1", "here is a test value1")
+        self.db.delete("test_str")
+        with self.assertRaises(KeyError):
+            self.db.read("test_str")
+
+    def test_delete_read(self):
+        """test deleting an element, and then reading another"""
+        self.db.write("test_str", "here is a test value")
+        self.db.write("test_str2", "here is a test value2")
+        self.db.delete("test_str")
+        self.assertEqual("here is a test value2", self.db.read("test_str2"))
+
+    def test_delete_read_restart(self):
+        """test deleting an element, and then reading another after a restart"""
+        self.db.write("test_str", "here is a test value")
+        self.db.write("test_str2", "here is a test value2")
+        self.db.delete("test_str")
+        self.restart()
+        self.assertEqual("here is a test value2", self.db.read("test_str2"))
