@@ -42,7 +42,7 @@ Key type       | 1                | Marks if the key is an integer or a string.
 Key            | any              | The key for the database entry.
 NUL            | 1                | Marks the end of the key. This is necessary since string keys don't have a set size.
 Content length | content_int_size | An integer (little endian) depicting the length of the content (including the content type). Defaults to 4 bytes long. This is the end to what is considered the "header" for the entry
-Content type   | 1                | Marks if the content is a string, int, list, or dict.
+Content type   | 1                | Marks if the content is a string, int, list, dict, or bytes.
 Content        | Content length   | Stores the content
 
 #### Content type labels
