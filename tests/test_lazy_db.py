@@ -116,3 +116,18 @@ class TestLazy_db(unittest.TestCase):
         self.db.delete("test_str")
         self.restart()
         self.assertEqual("here is a test value2", self.db.read("test_str2"))
+
+    def test_write_bytes(self):
+        """test writing bytes to database"""
+        self.db.write("test_str", b"Hi there (but in bytes)")
+        self.db.write("test_str2", b"Hi there (but in bytes)2")
+        self.assertEqual(b"Hi there (but in bytes)", self.db.read("test_str"))
+        self.assertEqual(b"Hi there (but in bytes)2", self.db.read("test_str2"))
+
+    def test_write_bytes_restart(self):
+        """test writing bytes to database with restart"""
+        self.db.write("test_str", b"Hi there (but in bytes)")
+        self.db.write("test_str2", b"Hi there (but in bytes)2")
+        self.restart()
+        self.assertEqual(b"Hi there (but in bytes)", self.db.read("test_str"))
+        self.assertEqual(b"Hi there (but in bytes)2", self.db.read("test_str2"))

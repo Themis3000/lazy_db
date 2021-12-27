@@ -169,9 +169,11 @@ class LazyDb:
             return self.bytes_to_dict(bytes_data)
         if bytes_type == 4:
             return self.bytes_to_list(bytes_data)
+        if bytes_type == 5:
+            return bytes_data
         raise TypeError(f"Incorrect type header byte: {bytes_type}. Your database may be corrupted.")
 
-    def to_bytes(self, value: Union[str, int, List[Union[str, int, dict]], Dict[Union[str, int], Union[str, int, list, dict]]], add_type_header: bool = True) -> bytes:
+    def to_bytes(self, value: Union[str, bytes, int, List[Union[str, int, dict]], Dict[Union[str, int], Union[str, int, list, dict]]], add_type_header: bool = True) -> bytes:
         """Converts a given object to byte form"""
         if isinstance(value, str):
             return self.str_to_bytes(value, add_type_header=add_type_header)
@@ -181,6 +183,10 @@ class LazyDb:
             return self.list_to_bytes(value, add_type_header=add_type_header)
         if isinstance(value, dict):
             return self.dict_to_bytes(value, add_type_header=add_type_header)
+        if isinstance(value, bytes):
+            if add_type_header:
+                return b"\x05" + value
+            return value
         raise TypeError(f"{type(value)} is not a supported content type to be written to the database.")
 
     def gen_header(self, key: Union[str, int], data: bytes) -> Tuple[bytes, int]:
@@ -214,7 +220,7 @@ class LazyDb:
         write_location = self.write_raw_bytes(header + data)
         return write_location + content_offset
 
-    def write(self, key: Union[str, int], value: Union[str, int, List[Union[str, int, dict]], Dict[Union[str, int], Union[str, int, list, dict]]]):
+    def write(self, key: Union[str, int], value: Union[str, bytes, int, List[Union[str, int, dict]], Dict[Union[str, int], Union[str, int, list, dict]]]):
         """Writes a string, list, integer, or a dict to the database."""
         data = self.to_bytes(value)
         content_location = self.write_bytes(key, data)
