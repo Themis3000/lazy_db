@@ -11,13 +11,14 @@ class IndexingError(Exception):
 
 
 class LazyDb:
-    def __init__(self, file: str, key_int_size: int = 4, content_int_size: int = 4):
+    def __init__(self, file: str, key_int_size: int = 4, content_int_size: int = 4, int_list_size: int = 4):
         """Opens database and sets specified db settings if bootstrapping a new database"""
         path = Path(file)
         if not path.is_file():
             path.touch()
             self.key_int_size = key_int_size
             self.content_int_size = content_int_size
+            self.int_list_size = int_list_size
             self.f = open(file, "rb+")
             self.write_info()
             self.headers = {}
@@ -27,6 +28,7 @@ class LazyDb:
         info = self.get_info()
         self.key_int_size = info["key_int_size"]
         self.content_int_size = info["content_int_size"]
+        self.int_list_size = info["int_list_size"]
         self.headers = self.get_headers()
 
     def get_headers(self) -> Dict[Union[str, int], int]:
@@ -105,7 +107,8 @@ class LazyDb:
     def write_info(self):
         """Writes db info. Only should be called when a new database is bootstrapped"""
         info = {"key_int_size": self.key_int_size,
-                "content_int_size": self.content_int_size}
+                "content_int_size": self.content_int_size,
+                "int_list_size": self.int_list_size}
         info_str = self.dict_to_bytes(info, add_type_header=False)
         self.f.write(info_str + b"\x00")
 
@@ -148,14 +151,28 @@ class LazyDb:
             return b"\x03" + data
         return data
 
-    def bytes_to_list(self, bytes_in: bytes) -> list:
-        """Convert bytes to list"""
-        raise NotImplementedError("lists are not yet implemented")
+    def bytes_to_int_list(self, bytes_in: bytes) -> list:
+        """Convert bytes to int list"""
+        list_out = []
+        byte_groups = len(bytes_in) // self.int_list_size
+        for i in range(byte_groups):
+            start = i * self.int_list_size
+            group = bytes_in[start:start + self.int_list_size]
+            int_decoded = self.bytes_to_int(group)
+            list_out.append(int_decoded)
+        return list_out
 
-    def list_to_bytes(self, list_in: list, add_type_header: bool = True) -> bytes:
-        """Convert list to bytes"""
-        raise NotImplementedError("lists are not yet implemented")
-        # return b"\x04" + b"test"
+    def int_list_to_bytes(self, list_in: List[int], add_type_header: bool = True) -> bytes:
+        """Convert int list to bytes"""
+        out_array = bytearray()
+        for value in list_in:
+            value_bytes = self.int_to_bytes(value, add_type_header=False, length=self.int_list_size)
+            out_array.extend(value_bytes)
+
+        if add_type_header:
+            out_array.insert(0, 4)
+            return bytes(out_array)
+        return bytes(out_array)
 
     def from_bytes(self, bytes_data: bytes) -> Union[str, int, List[Union[str, int, dict]], Dict[Union[str, int], Union[str, int, list, dict]]]:
         """Converts a given bytes value to object form"""
@@ -168,7 +185,7 @@ class LazyDb:
         if bytes_type == 3:
             return self.bytes_to_dict(bytes_data)
         if bytes_type == 4:
-            return self.bytes_to_list(bytes_data)
+            return self.bytes_to_int_list(bytes_data)
         if bytes_type == 5:
             return bytes_data
         raise TypeError(f"Incorrect type header byte: {bytes_type}. Your database may be corrupted.")
@@ -180,7 +197,7 @@ class LazyDb:
         if isinstance(value, int):
             return self.int_to_bytes(value, add_type_header=add_type_header)
         if isinstance(value, list):
-            return self.list_to_bytes(value, add_type_header=add_type_header)
+            return self.int_list_to_bytes(value, add_type_header=add_type_header)
         if isinstance(value, dict):
             return self.dict_to_bytes(value, add_type_header=add_type_header)
         if isinstance(value, bytes):

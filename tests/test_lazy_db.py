@@ -131,3 +131,18 @@ class TestLazy_db(unittest.TestCase):
         self.restart()
         self.assertEqual(b"Hi there (but in bytes)", self.db.read("test_str"))
         self.assertEqual(b"Hi there (but in bytes)2", self.db.read("test_str2"))
+
+    def test_write_int_list(self):
+        """Tests writing int list to db"""
+        self.db.write("test_str", [435, 4636, 123, 768, 2356, 436])
+        self.db.write("test_str2", [436, 2356, 35, 235, 6546, 4537])
+        self.assertEqual([435, 4636, 123, 768, 2356, 436], self.db.read("test_str"))
+        self.assertEqual([436, 2356, 35, 235, 6546, 4537], self.db.read("test_str2"))
+
+    def test_write_int_list_restart(self):
+        """Tests writing int list to db with restart"""
+        self.db.write("test_str", [435, 4636, 123, 768, 2356, 436])
+        self.db.write("test_str2", [436, 2356, 35, 235, 6546, 4537])
+        self.restart()
+        self.assertEqual([435, 4636, 123, 768, 2356, 436], self.db.read("test_str"))
+        self.assertEqual([436, 2356, 35, 235, 6546, 4537], self.db.read("test_str2"))
