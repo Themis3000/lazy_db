@@ -236,12 +236,14 @@ class LazyDb:
     def delete(self, key: Union[str, int]):
         """Deletes a entry from the database"""
         content_len = self.read_len(key)
+        entry_location = self.f.tell()
         header_len = self.reconstruct_header_size(key)
         entry_len = header_len + content_len
 
         # Seeks to the end of the entry to be deleted
         self.f.seek(content_len, io.SEEK_CUR)
 
+        # Steps all preceding data backwards to overwrite the deleted entry
         while data := self.f.read(1024):
             read_end = self.f.tell()
             back_bytes = len(data) + entry_len
@@ -249,11 +251,18 @@ class LazyDb:
             self.f.write(data)
             self.f.seek(read_end, io.SEEK_SET)
 
+        # Cuts off the now unused end of the file
         self.f.seek(0, io.SEEK_END)
         end = self.f.tell()
         self.f.truncate(end - entry_len)
 
-        self.headers = self.get_headers()
+        # Deletes entry key from cache
+        del self.headers[key]
+
+        # Corrects locations of entries
+        for key, location in self.headers.items():
+            if location >= entry_location:
+                self.headers[key] = location - entry_len
 
     def close(self):
         """Close the database"""
