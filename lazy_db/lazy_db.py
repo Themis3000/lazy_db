@@ -231,6 +231,8 @@ class LazyDb:
             key_size = len(self.str_to_bytes(key, add_type_header=False))
         else:
             key_size = self.key_int_size
+        # Adds the size of a content int, the size of the key, and 3 for the 3 NUL byte separators in order to figure
+        # out the header length in bytes
         return self.content_int_size + key_size + 3
 
     def delete(self, key: Union[str, int]):
