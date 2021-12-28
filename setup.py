@@ -32,7 +32,7 @@ setup(
     long_description_content_type='text/markdown',
     include_package_data=True,
     keywords='lazy_db',
-    name='lazy_db',
+    name='lazy_database',
     packages=find_packages(include=['lazy_db', 'lazy_db.*']),
     test_suite='tests',
     tests_require=test_requirements,
