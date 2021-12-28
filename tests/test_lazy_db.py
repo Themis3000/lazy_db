@@ -146,3 +146,10 @@ class TestLazy_db(unittest.TestCase):
         self.restart()
         self.assertEqual([435, 4636, 123, 768, 2356, 436], self.db.read("test_str"))
         self.assertEqual([436, 2356, 35, 235, 6546, 4537], self.db.read("test_str2"))
+
+    def delete_last_value(self):
+        """Deletes the last value in a database and restarts"""
+        self.db.write("test_str", "test")
+        self.db.delete("test_str")
+        self.restart()
+        self.assertEqual(0, len(self.db.headers))
