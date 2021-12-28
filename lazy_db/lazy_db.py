@@ -249,8 +249,9 @@ class LazyDb:
             self.f.write(data)
             self.f.seek(read_end, io.SEEK_SET)
 
-        self.f.seek(entry_len, io.SEEK_END)
-        self.f.truncate()
+        self.f.seek(0, io.SEEK_END)
+        end = self.f.tell()
+        self.f.truncate(end - entry_len)
 
         self.headers = self.get_headers()
 
