@@ -45,13 +45,13 @@ Content        | Content length   | Stores the content
 
 #### Content type labels
 
-Name     | Hex type value
----------|---------------
-String   | 0x01
-Int      | 0x02
-Dict     | 0x03
-Int list | 0x04
-Bytes    | 0x05
+Name     | Hex type value | Type description
+---------|----------------|-------------
+String   | 0x01           | A utf-8 string
+Int      | 0x02           | An integer
+Dict     | 0x03           | A dictionary (internally stored as a utf-8 json string)
+Int list | 0x04           | A list of integers. Max integer size is defined by int_list_size (default: 4 bytes)
+Bytes    | 0x05           | A bytes object
 
 #### The algorithm
 
