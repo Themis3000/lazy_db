@@ -12,7 +12,7 @@ To install lazy_db, run this command in your terminal:
 
 .. code-block:: console
 
-    $ pip install lazy_db
+    $ pip install lazy-database
 
 This is the preferred method to install lazy_db, as it will always install the most recent stable release.
 

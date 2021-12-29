@@ -8,9 +8,8 @@ Welcome to lazy_db's documentation!
    readme
    installation
    usage
-   modules
+   LazyDb
    contributing
-   history
 
 Indices and tables
 ==================

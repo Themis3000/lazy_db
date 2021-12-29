@@ -35,13 +35,6 @@ Implement Features
 Look through the GitHub issues for features. Anything tagged with "enhancement"
 and "help wanted" is open to whoever wants to implement it.
 
-Write Documentation
-~~~~~~~~~~~~~~~~~~~
-
-lazy_db could always use more documentation, whether as part of the
-official lazy_db docs, in docstrings, or even on the web in blog posts,
-articles, and such.
-
 Submit Feedback
 ~~~~~~~~~~~~~~~
 
@@ -99,12 +92,8 @@ Pull Request Guidelines
 Before you submit a pull request, check that it meets these guidelines:
 
 1. The pull request should include tests.
-2. If the pull request adds functionality, the docs should be updated. Put
-   your new functionality into a function with a docstring, and add the
-   feature to the list in README.rst.
-3. The pull request should work for Python 3.5, 3.6, 3.7 and 3.8, and for PyPy. Check
-   https://travis-ci.com/Themis3000/lazy_db/pull_requests
-   and make sure that the tests pass for all supported Python versions.
+2. If the pull request adds functionality, be sure to leave a detailed description of what the new functionality is.
+3. The pull request should work for Python 3.8+ and PyPy.
 
 Tips
 ----
@@ -117,12 +106,10 @@ To run a subset of tests::
 Deploying
 ---------
 
-A reminder for the maintainers on how to deploy.
-Make sure all your changes are committed (including an entry in HISTORY.rst).
+Make sure all your changes are committed
 Then run::
 
 $ bump2version patch # possible: major / minor / patch
 $ git push
-$ git push --tags
 
-Travis will then deploy to PyPI if tests pass.
+Deployment to pypi and release descriptions will be taken care of by maintainers.
