@@ -8,11 +8,5 @@ Welcome to lazy_db's documentation!
    readme
    installation
    usage
-   LazyDb
    contributing
-
-Indices and tables
-==================
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+   history

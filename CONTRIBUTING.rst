@@ -103,13 +103,3 @@ To run a subset of tests::
 
     $ python -m unittest tests.test_lazy_db
 
-Deploying
----------
-
-Make sure all your changes are committed
-Then run::
-
-$ bump2version patch # possible: major / minor / patch
-$ git push
-
-Deployment to pypi and release descriptions will be taken care of by maintainers.
