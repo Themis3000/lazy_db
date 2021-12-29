@@ -12,7 +12,14 @@ class IndexingError(Exception):
 
 class LazyDb:
     def __init__(self, file: str, key_int_size: int = 4, content_int_size: int = 4, int_list_size: int = 4):
-        """Opens database and sets specified db settings if bootstrapping a new database"""
+        """
+        Opens database and sets specified db settings if bootstrapping a new database
+
+        :param file: A file location in string form.
+        :param key_int_size: The amount of bytes long a key should be when it's an integer
+        :param content_int_size: The amount of bytes used to describe content length
+        :param int_list_size: The amount of bytes used to define each entry in a list
+        """
         path = Path(file)
         if not path.is_file():
             path.touch()
@@ -72,7 +79,12 @@ class LazyDb:
         return self.bytes_to_int(length_bytes)
 
     def read(self, key: Union[str, int]) -> Union[str, int, List[Union[str, int, dict]], Dict[Union[str, int], Union[str, int, list, dict]], None]:
-        """Gets a value"""
+        """
+        Gets a value from the database
+
+        :param key: The key of the entry you are reading
+        :return: Content under key specified
+        """
         length = self.read_len(key)
 
         content_bytes = self.f.read(length)
@@ -238,7 +250,12 @@ class LazyDb:
         return write_location + content_offset
 
     def write(self, key: Union[str, int], value: Union[str, bytes, int, List[Union[str, int, dict]], Dict[Union[str, int], Union[str, int, list, dict]]]):
-        """Writes a string, list, integer, or a dict to the database."""
+        """
+        Writes a string, list, integer, or a dict to the database.
+
+        :param key: key to store value under. Key must not be already used
+        :param value: content to store under specified key
+        """
         data = self.to_bytes(value)
         content_location = self.write_bytes(key, data)
         self.headers[key] = content_location
@@ -284,5 +301,5 @@ class LazyDb:
                 self.headers[key] = location - entry_len
 
     def close(self):
-        """Close the database"""
+        """Closes the database"""
         self.f.close()
