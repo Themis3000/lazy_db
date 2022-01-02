@@ -14,7 +14,7 @@ test_requirements = [ ]
 setup(
     author="Themi Megas",
     author_email='tcm4760@gmail.com',
-    python_requires='>=3.6',
+    python_requires='>=3.8',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
@@ -37,6 +37,6 @@ setup(
     test_suite='tests',
     tests_require=test_requirements,
     url='https://github.com/Themis3000/lazy_db',
-    version='1.0.0',
+    version='1.0.1',
     zip_safe=False,
 )
