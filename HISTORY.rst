@@ -19,3 +19,8 @@ History
 * Docs updated
 * Readme updated
 * Docstrings added
+
+1.0.1 (2022-1-2)
+----------------
+
+* Updated python require version to >=3.8 due to usage of the walrus operator
