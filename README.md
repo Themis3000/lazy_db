@@ -15,10 +15,16 @@ Example usage:
 ```python
 from lazy_db import LazyDb
 
+# Simple example usage
 db = LazyDb("test.lazy")
 db.write("test_value", "value")
 print(db.read("test_value"))  # prints "value"
 db.close()
+
+# Or use a with statement to insure the database file is closed cleanly and avoid having to call db.close() on your own
+with LazyDb("test2.lazy") as db:
+    db.write("test_value", "value")
+    print(db.read("test_value"))
 ```
 
 ## How it works
