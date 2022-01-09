@@ -303,3 +303,9 @@ class LazyDb:
     def close(self):
         """Closes the database"""
         self.f.close()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()

@@ -8,7 +8,7 @@ import os
 from lazy_db import lazy_db
 
 
-class TestLazy_db(unittest.TestCase):
+class TestLazyDb(unittest.TestCase):
     """Tests for `lazy_db` package."""
 
     def setUp(self):
@@ -147,9 +147,35 @@ class TestLazy_db(unittest.TestCase):
         self.assertEqual([435, 4636, 123, 768, 2356, 436], self.db.read("test_str"))
         self.assertEqual([436, 2356, 35, 235, 6546, 4537], self.db.read("test_str2"))
 
-    def delete_last_value(self):
+    def test_delete_last_value(self):
         """Deletes the last value in a database and restarts"""
         self.db.write("test_str", "test")
         self.db.delete("test_str")
         self.restart()
         self.assertEqual(0, len(self.db.headers))
+
+
+class TestLazyDbSetupless(unittest.TestCase):
+    """Tests for `lazy_db` package that don't use to use setup or teardown methods."""
+
+    def test_context(self):
+        """Tests if the database can be opened and closed via the with statement."""
+        with lazy_db.LazyDb("test_db.lazydb") as db:
+            db.write("test_str", "test val")
+            self.assertEqual("test val", db.read("test_str"))
+            self.assertFalse(db.f.closed, "file prematurely closed")
+        self.assertTrue(db.f.closed, "file not closed after exiting context")
+        os.remove("test_db.lazydb")
+
+    def test_context_exception(self):
+        """Tests if the database can be opened and closed via the with statement cleanly with an exception"""
+        try:
+            with lazy_db.LazyDb("test_db.lazydb") as db:
+                db.write("test_str", "test val")
+                db.write("test_str", "test val")
+                self.fail("No exception was triggered after inserting 2 keys of the same name into the database")
+        except:
+            pass
+
+        self.assertTrue(db.f.closed)
+        os.remove("test_db.lazydb")
