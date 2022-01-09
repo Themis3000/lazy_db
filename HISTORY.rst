@@ -20,7 +20,12 @@ History
 * Readme updated
 * Docstrings added
 
-1.0.1 (2022-1-2)
-----------------
+1.0.1 (2022-01-02)
+------------------
 
 * Updated python require version to >=3.8 due to usage of the walrus operator
+
+1.1.0 (2022-01-09)
+------------------
+
+* Added support for context managers, the with statement can now be used to open and cleanly exit databases
