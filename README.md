@@ -7,7 +7,11 @@
 * Free software: MIT license
 * Documentation: https://lazy-db.readthedocs.io.
 
-A lazily loaded key:value db intended for use with large datasets that are too big to be loaded into memory. The database supports integers, strings, lists of integers, bytes, and dictionaries. This database is meant to strike a good balance of retrieval/insertion speed and memory usage. This database best fits a scenario where each key has a lot of data stored under it. Scenarios where values are under 100 bytes in size this database is not very well suited for.
+A lazily loaded key:value db intended for use with large datasets that are too big to be loaded into memory.
+
+With very quick retrival and insertion times, this database is meant to strike a balance of retrieval/insertion speed and memory usage.
+
+The database supports integers, strings, lists of integers, bytes, and dictionaries. This database best fits a scenario where each key has a lot of data stored under it. Scenarios where you have many values are under 100 bytes in size this database is not very well suited for.
 
 Install with `pip install lazy-database`
 
