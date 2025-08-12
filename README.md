@@ -1,7 +1,6 @@
 # lazy_db
 
 [![badge](https://img.shields.io/pypi/v/lazy-database.svg)](https://pypi.python.org/pypi/lazy-database)
-[![badge](https://readthedocs.org/projects/lazy-db/badge/?version=latest)](https://lazy-db.readthedocs.io/en/latest/?version=latest)
 ![badge](https://raw.githubusercontent.com/Themis3000/lazy_db/refs/heads/coverage-badge/coverage.svg)
 
 * Free software: MIT license
