@@ -10,6 +10,8 @@ A lazily loaded key:value db intended for use with large datasets that are too b
 
 With very quick retrival and insertion times, this database is meant to strike a balance of retrieval/insertion speed and memory usage.
 
+Because no external dependencies used, with package is extremely lightweight.
+
 The database supports integers, strings, lists of integers, bytes, and dictionaries. This database best fits a scenario where each key has a lot of data stored under it. Scenarios where you have many values are under 100 bytes in size this database is not very well suited for.
 
 Install with `pip install lazy-database`
