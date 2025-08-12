@@ -35,25 +35,25 @@ All text in database files are encoded in utf-8 format. Each database has a json
 
 Each database entry is appended at the end of the file and is laid out in this format:
 
-Name           | Size (bytes)     | Purpose
----------------|------------------|-------------
-NUL            | 1                | Marks the start of the entry. When the initial headers index, the starting byte of each entry is checked for this NUL byte to be sure the database hasn't been corrupted. This is the beginning to what is considered the "header" for the entry (NUL bytes carry a hex value of 0x00)
-Key type       | 1                | Marks if the key is an integer or a string.
-Key            | any              | The key for the database entry.
-NUL            | 1                | Marks the end of the key. This is necessary since string keys don't have a set size.
-Content length | content_int_size | An integer (little endian) depicting the length of the content (including the content type). Defaults to 4 bytes long. This is the end to what is considered the "header" for the entry
-Content type   | 1                | Marks if the content is a string, int, int list, dict, or bytes.
-Content        | Content length   | Stores the content
+| Name           | Size (bytes)     | Purpose                                                                                                                                                                                                                                                                                |
+|----------------|------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| NUL            | 1                | Marks the start of the entry. When the initial headers index, the starting byte of each entry is checked for this NUL byte to be sure the database hasn't been corrupted. This is the beginning to what is considered the "header" for the entry (NUL bytes carry a hex value of 0x00) |
+| Key type       | 1                | Marks if the key is an integer or a string.                                                                                                                                                                                                                                            |
+| Key            | any              | The key for the database entry.                                                                                                                                                                                                                                                        |
+| NUL            | 1                | Marks the end of the key. This is necessary since string keys don't have a set size.                                                                                                                                                                                                   |
+| Content length | content_int_size | An integer (little endian) depicting the length of the content (including the content type). Defaults to 4 bytes long. This is the end to what is considered the "header" for the entry                                                                                                |
+| Content type   | 1                | Marks if the content is a string, int, int list, dict, or bytes.                                                                                                                                                                                                                       |
+| Content        | Content length   | Stores the content                                                                                                                                                                                                                                                                     |
 
 #### Content type labels
 
-Name     | Hex type value | Type description
----------|----------------|-------------
-String   | 0x01           | A utf-8 string
-Int      | 0x02           | An integer
-Dict     | 0x03           | A dictionary (internally stored as a utf-8 json string)
-Int list | 0x04           | A list of integers. Max integer size is defined by int_list_size (default: 4 bytes)
-Bytes    | 0x05           | A bytes object
+| Name     | Hex type value | Type description                                                                    |
+|----------|----------------|-------------------------------------------------------------------------------------|
+| String   | 0x01           | A utf-8 string                                                                      |
+| Int      | 0x02           | An integer                                                                          |
+| Dict     | 0x03           | A dictionary (internally stored as a utf-8 json string)                             |
+| Int list | 0x04           | A list of integers. Max integer size is defined by int_list_size (default: 4 bytes) |
+| Bytes    | 0x05           | A bytes object                                                                      |
 
 #### The algorithm
 
